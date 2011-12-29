@@ -1628,12 +1628,18 @@ int fimc_resume(struct platform_device *pdev)
 {
 	struct fimc_control *ctrl;
 	struct s3c_platform_fimc *pdata;
-	int id = pdev->id;
+	int in_use, id = pdev->id;
 
 	ctrl = get_fimc_ctrl(id);
 	pdata = to_fimc_plat(ctrl->dev);
 
+<<<<<<< HEAD
 	if (atomic_read(&ctrl->in_use) && ctrl->status != FIMC_OFF_SLEEP)
+=======
+	in_use = atomic_read(&ctrl->in_use);
+
+	if (in_use)
+>>>>>>> d9a0c42... When resuming a FIMC device which is in use the device clock and
 		fimc_clk_en(ctrl, true);
 
 	if (ctrl->out)
@@ -1643,6 +1649,9 @@ int fimc_resume(struct platform_device *pdev)
 	else
 		ctrl->status = FIMC_STREAMOFF;
 
+	if (in_use && 0 != ctrl->id)
+		fimc_clk_en(ctrl, false);
+	
 	return 0;
 }
 #else
