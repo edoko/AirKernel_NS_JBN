@@ -45,6 +45,9 @@
 
 #define NAME_SIZE	32
 
+#ifdef CONFIG_S5P_IDLE2
+#include <linux/wakelock.h>
+#endif
 static DEFINE_MUTEX(pcm_mutex);
 static DECLARE_WAIT_QUEUE_HEAD(soc_pm_waitq);
 

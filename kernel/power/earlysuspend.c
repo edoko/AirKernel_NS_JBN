@@ -1,6 +1,8 @@
 /* kernel/power/earlysuspend.c
  *
  * Copyright (C) 2005-2008 Google, Inc.
+ * Copyright (c) 2010 Samsung Electronics
+ * Copyright (c) 2012 Will Tisdale - <willtisdale@gmail.com>
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -22,6 +24,11 @@
 #include <linux/workqueue.h>
 
 #include "power.h"
+
+#ifdef CONFIG_S5P_IDLE2
+#include <mach/cpuidle.h>
+#endif /* CONFIG_S5P_IDLE2 */
+
 
 enum {
 	DEBUG_USER_STATE = 1U << 0,
@@ -91,6 +98,7 @@ static void early_suspend(struct work_struct *work)
 		mutex_unlock(&early_suspend_lock);
 		goto abort;
 	}
+	earlysuspend_active_fn(true);
 
 	if (debug_mask & DEBUG_SUSPEND)
 		pr_info("early_suspend: call handlers\n");
@@ -101,6 +109,7 @@ static void early_suspend(struct work_struct *work)
 			pos->suspend(pos);
 		}
 	}
+
 	mutex_unlock(&early_suspend_lock);
 
 	if (debug_mask & DEBUG_SUSPEND)
@@ -143,6 +152,7 @@ static void late_resume(struct work_struct *work)
 			pos->resume(pos);
 		}
 	}
+	earlysuspend_active_fn(false);
 	if (debug_mask & DEBUG_SUSPEND)
 		pr_info("late_resume: done\n");
 abort:

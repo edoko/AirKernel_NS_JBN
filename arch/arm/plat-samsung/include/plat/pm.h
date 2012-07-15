@@ -14,7 +14,10 @@
  * called from board at initialisation time to setup the power
  * management
 */
-
+#ifdef CONFIG_S5P_IDLE2
+#include <linux/wakelock.h>
+#include <mach/cpuidle.h>
+#endif /* CONFIG_S5P_IDLE2 */
 #include <linux/irq.h>
 
 struct sys_device;

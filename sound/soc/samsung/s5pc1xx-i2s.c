@@ -34,6 +34,9 @@
 #include <linux/wakelock.h>
 #include "s3c-dma.h"
 #include "s5pc1xx-i2s.h"
+#ifdef CONFIG_S5P_IDLE2
+#include <mach/cpuidle.h>
+#endif
 
 /*
  * The value should be set to maximum of the total number
@@ -757,6 +760,14 @@ static int s5p_i2s_wr_startup(struct snd_pcm_substream *substream,
 	}
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
+#ifdef CONFIG_S5P_IDLE2
+		/*
+		 * We set a 30 second delay when audio starts before idle2
+		 * is enabled. This stops audio notifications from switching
+		 * the idle mode.
+		 */
+		idle2_enable(30 * HZ);
+#endif
 		pr_debug("Inside..%s..for playback stream\n" , __func__);
 		tx_clk_enabled = 1;
 	} else {
@@ -793,6 +804,9 @@ static void s5p_i2s_wr_shutdown(struct snd_pcm_substream *substream,
 	struct s3c_i2sv2_info *i2s = to_info(dai);
 
 	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
+#ifdef CONFIG_S5P_IDLE2
+		idle2_disable();
+#endif
 		pr_debug("Inside %s for playback stream\n" , __func__);
 		tx_clk_enabled = 0;
 	} else {

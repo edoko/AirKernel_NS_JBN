@@ -103,6 +103,26 @@ config S5P_DEV_FB
 	help
 	  Compile in platform device definitions for FIMD controller
 
+config S5P_IDLE2
+	bool "Support S5P IDLE2 functionality"
+	depends on CPU_IDLE && PM && !S5PV210_CORESIGHT
+	default y
+	help
+	  IDLE2 enables additional power saving when audio is playing and the
+	  device is turned off. It achieves this by power gating the Cortex-A8 
+	  applications processor whenever possible. It will not provide any
+	  power savings when audio is not playing and / or the display is
+	  turned on.
+
+
+config S5P_IDLE2_DEBUG
+	bool "IDLE2 debug messages (will impact performance)"
+	depends on S5P_IDLE2
+	default n
+	help
+	  IDLE2 debug messages, this will impact performance so useful only for
+	  testing.
+
 config S5P_HIGH_RES_TIMERS
 	bool "HRtimer and Dynamic Tick support"
 	select GENERIC_CLOCKEVENTS

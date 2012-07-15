@@ -1038,6 +1038,7 @@ static int acpi_processor_setup_cpuidle(struct acpi_processor *pr)
 
 			case ACPI_STATE_C3:
 			state->flags |= CPUIDLE_FLAG_TIME_VALID;
+			state->flags |= CPUIDLE_FLAG_CHECK_BM;
 			state->enter = pr->flags.bm_check ?
 					acpi_idle_enter_bm :
 					acpi_idle_enter_simple;

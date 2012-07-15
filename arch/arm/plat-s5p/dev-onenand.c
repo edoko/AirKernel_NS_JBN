@@ -43,3 +43,4 @@ struct platform_device s5p_device_onenand = {
 	.num_resources	= ARRAY_SIZE(s5p_onenand_resources),
 	.resource	= s5p_onenand_resources,
 };
+EXPORT_SYMBOL(s5p_device_onenand);

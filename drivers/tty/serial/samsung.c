@@ -52,6 +52,10 @@
 
 #include "samsung.h"
 
+#ifdef CONFIG_S5P_IDLE2
+#include <mach/cpuidle.h>
+#endif /* CONFIG_S5P_IDLE2 */
+
 /* UART name and device definitions */
 
 #define S3C24XX_SERIAL_NAME	"ttySAC"
@@ -462,13 +466,19 @@ static void s3c24xx_serial_pm(struct uart_port *port, unsigned int level,
 
 		if (!IS_ERR(ourport->baudclk) && ourport->baudclk != NULL)
 			clk_disable(ourport->baudclk);
-
+#ifdef CONFIG_S5P_IDLE2
+		if (ourport->port.irq == IRQ_S3CUART_RX1)
+			idle2_cancel_topon(10 * HZ);
+#endif /* CONFIG_S5P_IDLE2 */
 		clk_disable(ourport->clk);
 		break;
 
 	case 0:
 		clk_enable(ourport->clk);
-
+#ifdef CONFIG_S5P_IDLE2
+		if (ourport->port.irq == IRQ_S3CUART_RX1)
+			idle2_needs_topon();
+#endif /* CONFIG_S5P_IDLE2 */
 		if (!IS_ERR(ourport->baudclk) && ourport->baudclk != NULL)
 			clk_enable(ourport->baudclk);
 
