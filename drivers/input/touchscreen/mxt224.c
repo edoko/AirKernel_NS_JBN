@@ -341,6 +341,7 @@ static void report_input_data(struct mxt224_data *data)
 		    {
 			touchkey_pressed();
 		    }
+#endif
 	}
 	data->finger_mask = 0;
 

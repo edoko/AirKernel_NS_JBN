@@ -129,7 +129,7 @@ static void all_keys_up(struct cypress_touchkey_devdata *devdata)
 		input_report_key(devdata->input_dev,
 						devdata->pdata->keycode[i], 0);
 
-	input_sy<nc(devdata->input_dev);
+	input_sync(devdata->input_dev);
 }
 
 static int recovery_routine(struct cypress_touchkey_devdata *devdata)
@@ -491,6 +491,7 @@ static struct bld_implementation cypress_touchkey_bld =
     {
 	.enable = cypress_touchkey_bld_enable,
 	.disable = cypress_touchkey_bld_disable,
+    };
 #endif
 
 #ifdef CONFIG_TOUCH_WAKE
