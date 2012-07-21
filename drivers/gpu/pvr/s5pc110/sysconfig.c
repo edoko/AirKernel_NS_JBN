@@ -93,14 +93,11 @@ IMG_UINT32   PVRSRV_BridgeDispatchKM( IMG_UINT32  Ioctl,
 static struct clk *g3d_clock;
 static struct regulator *g3d_pd_regulator;
 
-<<<<<<< HEAD
 #ifdef CONFIG_LIVE_OC
 extern unsigned long get_gpuminfreq(void);
 #endif
-=======
 #ifdef CONFIG_PVR_LIMIT_MINFREQ
 #define MIN_CPU_KHZ_FREQ 200000
->>>>>>> f16e51c... Added kernel config option 'PVR_LIMIT_MINFREQ'.
 
 static int limit_adjust_cpufreq_notifier(struct notifier_block *nb,
 					 unsigned long event, void *data)
