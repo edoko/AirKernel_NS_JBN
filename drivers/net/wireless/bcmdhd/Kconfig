@@ -52,3 +52,10 @@ config DHD_ENABLE_P2P
 	default n
 	---help---
 	  Use Enable Wifi Direct
+
+config BCMDHD_PM_OPTION
+	bool "Enable Changing PM_FAST or PM_MAX"
+	depends on BCMDHD
+	default y
+	---help---
+	  Enable Changing PM_FAST or PM_MAX for BCMDHD

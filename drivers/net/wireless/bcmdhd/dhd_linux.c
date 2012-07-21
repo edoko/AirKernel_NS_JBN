@@ -525,6 +525,12 @@ static void dhd_set_packet_filter(int value, dhd_pub_t *dhd)
 #endif
 }
 
+#ifdef CONFIG_BCMDHD_PM_OPTION
+static int pm_option = 0;
+
+module_param(pm_option, int, 0755);
+#endif
+
 static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 {
 	int power_mode = PM_MAX;
@@ -535,6 +541,11 @@ static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 
 	DHD_TRACE(("%s: enter, value = %d in_suspend=%d\n",
 		__FUNCTION__, value, dhd->in_suspend));
+
+#ifdef CONFIG_BCMDHD_PM_OPTION
+	if (pm_option == 1)
+	    power_mode = PM_FAST;
+#endif
 
 	dhd_suspend_lock(dhd);
 	if (dhd && dhd->up) {
