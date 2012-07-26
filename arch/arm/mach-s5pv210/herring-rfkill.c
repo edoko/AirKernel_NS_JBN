@@ -37,10 +37,6 @@
 #include <plat/irqs.h>
 #include "herring.h"
 
-#ifdef CONFIG_S5P_IDLE2
-#include <mach/cpuidle.h>
-#endif /* CONFIG_S5P_IDLE2 */
-
 #define IRQ_BT_HOST_WAKE      IRQ_EINT(21)
 
 static struct wake_lock rfkill_wake_lock;
@@ -163,17 +159,10 @@ irqreturn_t bt_host_wake_irq_handler(int irq, void *dev_id)
 {
 	pr_debug("[BT] bt_host_wake_irq_handler start\n");
 
-	if (gpio_get_value(GPIO_BT_HOST_WAKE)) {
+	if (gpio_get_value(GPIO_BT_HOST_WAKE))
 		wake_lock(&rfkill_wake_lock);
-#ifdef CONFIG_S5P_IDLE2
-		idle2_needs_topon();
-#endif
-	} else {
+	else
 		wake_lock_timeout(&rfkill_wake_lock, HZ);
-#ifdef CONFIG_S5P_IDLE2
-		idle2_cancel_topon(10 * HZ);
-#endif
-	}
 
 	return IRQ_HANDLED;
 }
