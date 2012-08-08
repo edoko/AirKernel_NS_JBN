@@ -26,10 +26,6 @@
 #include <mach/regs-clock.h>
 #include <mach/cpu-freq-v210.h>
 
-#ifdef CONFIG_CPU_DIDLE
-#include <linux/deep_idle.h>
-#endif
-
 static struct clk *cpu_clk;
 static struct clk *dmc0_clk;
 static struct clk *dmc1_clk;
@@ -252,20 +248,6 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 
 	if (relation & ENABLE_FURTHER_CPUFREQ)
 		no_cpufreq_access = false;
-#ifdef CONFIG_CPU_DIDLE
-	if (deepidle_is_enabled()) //DeepIdle 시작될 시에,
-	{
-		if (sleep == 1) //sleep이 1로 바뀌면 밑의 구문이 작동.
-		{
-			if (policy->max != 800000)
-			{
-				policy->max = 800000;
-				policy->user_policy.max = 800000;
-			}
-		}
-	}
-#endif
-
 	if (no_cpufreq_access) {
 #ifdef CONFIG_PM_VERBOSE
 		pr_err("%s:%d denied access to %s as it is disabled"

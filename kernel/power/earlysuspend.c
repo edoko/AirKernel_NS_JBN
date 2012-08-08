@@ -23,14 +23,6 @@
 
 #include "power.h"
 
-#ifdef CONFIG_CPU_DIDLE
-#include <linux/cpufreq.h>
-#include <linux/deep_idle.h>
-
-static unsigned long min_freq, min_policy_freq;
-unsigned int sleep;
-#endif
-
 enum {
 	DEBUG_USER_STATE = 1U << 0,
 	DEBUG_SUSPEND = 1U << 2,
@@ -186,41 +178,6 @@ void request_suspend_state(suspend_state_t new_state)
 		queue_work(suspend_work_queue, &late_resume_work);
 	}
 	requested_suspend_state = new_state;
-#ifdef CONFIG_CPU_DIDLE
-	struct cpufreq_policy *policy;
-
-	if (deepidle_is_enabled())
-	{
-		policy = cpufreq_cpu_get(0);
-		if ((new_state = PM_SUSPEND_MEM) && (sleep == 0))
-		{
-			/* 선언 */
-			min_freq = policy->max;
-			min_policy_freq = policy->user_policy.max;
-			policy->max = 800000;
-			policy->user_policy.max = 800000;
-			cpufreq_cpu_put(policy);
-
-			sleep = 1;
-		}
-		else
-		{
-			if (min_freq < 1000000)
-			{
-			/* 선언 */
-			min_freq = policy->max;
-			min_policy_freq = policy->user_policy.max;
-
-			sleep = 0;
-		}
-		policy->max = min_freq;
-		policy->user_policy.max = min_policy_freq;
-		cpufreq_cpu_put(policy);
-
-		sleep = 0;
-	}
-}		
-#endif
 	spin_unlock_irqrestore(&state_lock, irqflags);
 }
 
