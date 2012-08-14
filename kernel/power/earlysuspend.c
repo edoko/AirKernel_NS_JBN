@@ -90,12 +90,12 @@ static void early_suspend(struct work_struct *work)
 	{
 		preempt_enable();
 		local_irq_enable();
-		ret = cpufreq_driver_target(cpufreq_cpu_get(0), 400000,
+		ret = cpufreq_driver_target(cpufreq_cpu_get(0), 800000,
 					DISABLE_FURTHER_CPUFREQ);
 		if (ret < 0)
 			printk(KERN_WARNING "%s: Error %d locking CPUfreq\n", __func__, ret);
 		else
-			printk(KERN_INFO "%s: CPUfreq locked to 400MHz\n", __func__);
+			printk(KERN_INFO "%s: CPUfreq locked to 800MHz\n", __func__);
 		local_irq_disable();
 		preempt_disable();
 	}
@@ -150,12 +150,12 @@ static void late_resume(struct work_struct *work)
 	{
 		preempt_enable();
 		local_irq_enable();
-		ret = cpufreq_driver_target(cpufreq_cpu_get(0), 400000,
+		ret = cpufreq_driver_target(cpufreq_cpu_get(0), 800000,
 					ENABLE_FURTHER_CPUFREQ);
 		if (ret < 0)
 			printk(KERN_WARNING "%s: Error %d unlocking CPUfreq\n", __func__, ret);
 		else
-			printk(KERN_INFO "%s: CPUfreq unlocked from 400MHz\n", __func__);
+			printk(KERN_INFO "%s: CPUfreq unlocked from 800MHz\n", __func__);
 		local_irq_disable();
 		preempt_disable();
 	}
