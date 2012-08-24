@@ -390,11 +390,11 @@ static struct s3cfb_lcd r61408 = {
 };
 
 #ifdef CONFIG_S5PV210_HIGH_BIGMEM
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (6144 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (4608 * SZ_1K)
 //#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC1 (4 * SZ_1K) // X
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (6144 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC0 (14384 * SZ_1K) //36864
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (14384 * SZ_1K) //36864
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (5120 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC0 (13864 * SZ_1K) //36864
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (13864 * SZ_1K) //36864
 #else
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (4608 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC1 (4 * SZ_1K) // X
@@ -407,11 +407,11 @@ static struct s3cfb_lcd r61408 = {
 					     (CONFIG_FB_S3C_NR_BUFFERS + \
 						 (CONFIG_FB_S3C_NUM_OVLY_WIN * \
 						  CONFIG_FB_S3C_NUM_BUF_OVLY_WIN)))
-#ifdef CONFIG_S5PV210_HIGH_BIGMEM
+//#ifdef CONFIG_S5PV210_HIGH_BIGMEM
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (4092 * SZ_1K)
-#else
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (8192 * SZ_1K)
-#endif
+//#else
+//#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (8192 * SZ_1K)
+//#endif
 
 static struct s5p_media_device herring_media_devs[] = {
 	[0] = {
@@ -6110,7 +6110,7 @@ MACHINE_START(HERRING, "herring")
 	.map_io		= herring_map_io,
 	.init_machine	= herring_machine_init,
 #ifdef CONFIG_S5P_HIGH_RES_TIMERS
-	.timer		= &s5p_systimer,
+	.timer		= &s5p_systimer_timer,
 #else
 	.timer		= &s5p_timer,
 #endif
