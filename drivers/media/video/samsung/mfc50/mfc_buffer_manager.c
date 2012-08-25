@@ -164,13 +164,8 @@ int mfc_init_buffer(void)
 			free_node->size = mfc_port1_memsize;
 		} else {
 			free_node->start_addr = mfc_get_port0_buff_paddr();
-#ifdef CONFIG_S5PV210_HIGH_BIGMEM
-			free_node->size = mfc_port0_memsize -
+			free_node->size = mfc_port1_memsize -
 				(mfc_get_port0_buff_paddr() - mfc_get_fw_buff_paddr());
-#else
-free_node->size = mfc_port1_memsize -
-				(mfc_get_port0_buff_paddr() - mfc_get_fw_buff_paddr());
-#endif
 		}
 
 		list_add_tail(&(free_node->list), &mfc_free_mem_head[port_no]);
