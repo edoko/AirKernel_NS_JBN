@@ -7295,10 +7295,6 @@ s32 wl_update_wiphybands(struct wl_priv *wl)
 			wiphy->bands[index]->ht_cap.ampdu_density = IEEE80211_HT_MPDU_DENSITY_16;
 			wiphy->bands[index]->ht_cap.mcs.rx_mask[0] = 0xff;
 		}
-
-		if ((index >= 0) && bw_cap) {
-			wiphy->bands[index]->ht_cap.cap |= IEEE80211_HT_CAP_SGI_40;
-		}
 	}
 
 	wiphy_apply_custom_regulatory(wiphy, &brcm_regdom);
