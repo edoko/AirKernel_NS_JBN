@@ -110,7 +110,7 @@ static unsigned long min_sample_time;
 /*
  * The sample rate of the timer used to increase frequency
  */
-#define DEFAULT_TIMER_RATE (30 * USEC_PER_MSEC)
+#define DEFAULT_TIMER_RATE (20 * USEC_PER_MSEC)
 static unsigned long timer_rate;
 
 /*
@@ -334,10 +334,10 @@ static void cpufreq_interactive_timer(unsigned long data)
 	pcpu->target_set_time = pcpu->timer_run_time;
 
 	pcpu->target_freq = new_freq;
-	spin_lock_irqsave(&speedchange_cpumask_lock, flags);
-	cpumask_set_cpu(data, &speedchange_cpumask);
-	spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
-	wake_up_process(speedchange_task);
+    spin_lock_irqsave(&speedchange_cpumask_lock, flags);
+    cpumask_set_cpu(data, &speedchange_cpumask);
+    spin_unlock_irqrestore(&speedchange_cpumask_lock, flags);
+    wake_up_process(speedchange_task);
 
 rearm_if_notmax:
 	/*
@@ -397,7 +397,6 @@ static void cpufreq_interactive_tune(struct work_struct *work)
 		if (!pcpu->governor_enabled)
 			continue;
 
-
 		for_each_cpu(j, pcpu->policy->cpus) {
 			struct cpufreq_interactive_cpuinfo *pjcpu =
 					&per_cpu(cpuinfo, j);
@@ -425,7 +424,6 @@ static void cpufreq_interactive_tune(struct work_struct *work)
 				cur_tune_value = LOW_POWER_TUNE;
 		}
 	}
-
 }
 
 static void cpufreq_interactive_idle_start(void)
@@ -485,9 +483,9 @@ static void cpufreq_interactive_idle_end(void)
 	struct cpufreq_interactive_cpuinfo *pcpu =
 		&per_cpu(cpuinfo, smp_processor_id());
 
-	if (!pcpu->governor_enabled)
-		return;
-
+    if (!pcpu->governor_enabled)
+        return;
+    
 	pcpu->idling = 0;
 	smp_wmb();
 
@@ -528,7 +526,7 @@ static int cpufreq_interactive_speedchange_task(void *data)
 
 		if (cpumask_empty(&speedchange_cpumask)) {
 			spin_unlock_irqrestore(&speedchange_cpumask_lock,
-					       flags);
+                       flags);
 			schedule();
 
 			if (kthread_should_stop())
@@ -565,7 +563,7 @@ static int cpufreq_interactive_speedchange_task(void *data)
 							max_freq,
 							CPUFREQ_RELATION_H);
 			trace_cpufreq_interactive_setspeed(cpu,
-						     pcpu->target_freq,
+                             pcpu->target_freq,
 						     pcpu->policy->cur);
 		}
 	}
@@ -791,7 +789,6 @@ static ssize_t store_sampling_periods(struct kobject *kobj,
 	if (val == sampling_periods)
 		return count;
 
-
 	for_each_present_cpu(j) {
 		pcpu = &per_cpu(cpuinfo, j);
 		ret = del_timer_sync(&pcpu->cpu_timer);
@@ -826,7 +823,6 @@ out:
 			mod_timer(&pcpu->cpu_timer,
 				jiffies + usecs_to_jiffies(timer_rate));
 	}
-
 
 	return count;
 }
@@ -923,18 +919,18 @@ static struct attribute_group interactive_attr_group = {
 };
 
 static int cpufreq_interactive_idle_notifier(struct notifier_block *nb,
-					     unsigned long val,
-					     void *data)
+                                             unsigned long val,
+                                             void *data)
 {
 	switch (val) {
-	case IDLE_START:
-		cpufreq_interactive_idle_start();
-		break;
-	case IDLE_END:
-		cpufreq_interactive_idle_end();
-		break;
+        case IDLE_START:
+            cpufreq_interactive_idle_start();
+            break;
+        case IDLE_END:
+            cpufreq_interactive_idle_end();
+            break;
 	}
-
+    
 	return 0;
 }
 
@@ -997,8 +993,8 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 				&interactive_attr_group);
 		if (rc)
 			return rc;
-
-		idle_notifier_register(&cpufreq_interactive_idle_nb);
+            
+        idle_notifier_register(&cpufreq_interactive_idle_nb);
 		break;
 
 	case CPUFREQ_GOV_STOP:
@@ -1018,10 +1014,12 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *policy,
 			kfree(pcpu->load_history);
 		}
 
+		flush_work(&tune_work);
+
 		if (atomic_dec_return(&active_count) > 0)
 			return 0;
-
-		idle_notifier_unregister(&cpufreq_interactive_idle_nb);
+            
+        idle_notifier_unregister(&cpufreq_interactive_idle_nb);
 		sysfs_remove_group(cpufreq_global_kobject,
 				&interactive_attr_group);
 
@@ -1064,18 +1062,25 @@ static int __init cpufreq_interactive_init(void)
 		pcpu->cpu_tune_value = DEFAULT_TUNE;
 	}
 
-	spin_lock_init(&speedchange_cpumask_lock);
-	speedchange_task =
-		kthread_create(cpufreq_interactive_speedchange_task, NULL,
-			       "cfinteractive");
-	if (IS_ERR(speedchange_task))
-		return PTR_ERR(speedchange_task);
+    spin_lock_init(&tune_cpumask_lock);
+    spin_lock_init(&speedchange_cpumask_lock);
+
+    speedchange_task =
+        kthread_create(cpufreq_interactive_speedchange_task, NULL,
+                "cfinteractive");
+    if (IS_ERR(speedchange_task))
+        return PTR_ERR(speedchange_task);        
 
 	sched_setscheduler_nocheck(speedchange_task, SCHED_FIFO, &param);
 	get_task_struct(speedchange_task);
 
-	/* NB: wake up so the thread does not look hung to the freezer */
-	wake_up_process(speedchange_task);
+	tune_wq = alloc_workqueue("knteractive_tune", 0, 1);
+
+	INIT_WORK(&tune_work,
+		  cpufreq_interactive_tune);
+    
+    /* NB: wake up so the thread does not look hung to the freezer */
+    wake_up_process(speedchange_task);
 
 	return cpufreq_register_governor(&cpufreq_gov_interactive);
 }
@@ -1091,6 +1096,7 @@ static void __exit cpufreq_interactive_exit(void)
 	cpufreq_unregister_governor(&cpufreq_gov_interactive);
 	kthread_stop(speedchange_task);
 	put_task_struct(speedchange_task);
+	destroy_workqueue(tune_wq);
 }
 
 module_exit(cpufreq_interactive_exit);
