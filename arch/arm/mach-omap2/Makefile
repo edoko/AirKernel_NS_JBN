@@ -270,3 +270,14 @@ disp-$(CONFIG_OMAP2_DSS)		:= display.o
 obj-y					+= $(disp-m) $(disp-y)
 
 obj-y					+= common-board-devices.o
+<<<<<<< HEAD
+=======
+
+obj-$(CONFIG_OMAP_REMOTE_PROC)		+= remoteproc.o
+obj-$(CONFIG_OMAP_HSI_DEVICE)		+= omap_hsi.o
+obj-$(CONFIG_SEC_MODEM)			+= board-tuna-modems.o
+obj-$(CONFIG_ARCH_OMAP4)		+= omap_dmm.o
+obj-$(CONFIG_OMAP_FIQ_DEBUGGER)		+= omap_fiq_debugger.o
+obj-$(CONFIG_RQ_STATS)			+= rq_stats.o
+
+>>>>>>> 3dd1481... rq_stats: add run queue statistic collection to kernel tick scheduler
