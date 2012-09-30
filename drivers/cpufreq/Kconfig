@@ -139,7 +139,6 @@ config CPU_FREQ_DEFAULT_GOV_WHEATLEY
 	help
 	  Use the CPUFreq governor 'wheatley' as default.
 
->>>>>>> 8329298... cpufreq: separate Interactive governor into two, one with static settings and another one with dynamic settings (it adjusts itself according to load). The new governor is called Dynamic Interactive.
 config CPU_FREQ_DEFAULT_GOV_LAZY
 	bool "lazy"
 	select CPU_FREQ_GOV_LAZY
