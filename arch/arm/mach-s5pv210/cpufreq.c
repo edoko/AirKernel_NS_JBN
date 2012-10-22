@@ -760,12 +760,6 @@ void liveoc_update(unsigned int oc_value, unsigned int oc_low_freq, unsigned int
     return;
 }
 EXPORT_SYMBOL(liveoc_update);
-
-unsigned long get_gpuminfreq(void)
-{
-    return s5pv210_freq_table[L3].frequency;
-}
-EXPORT_SYMBOL(get_gpuminfreq);
 #endif
 
 static int __init s5pv210_cpu_init(struct cpufreq_policy *policy)
