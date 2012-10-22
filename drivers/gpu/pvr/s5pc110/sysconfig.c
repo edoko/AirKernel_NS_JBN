@@ -93,9 +93,6 @@ IMG_UINT32   PVRSRV_BridgeDispatchKM( IMG_UINT32  Ioctl,
 static struct clk *g3d_clock;
 static struct regulator *g3d_pd_regulator;
 
-#ifdef CONFIG_LIVE_OC
-extern unsigned long get_gpuminfreq(void);
-#endif
 #ifdef CONFIG_PVR_LIMIT_MINFREQ
 #define MIN_CPU_KHZ_FREQ 200000
 
@@ -103,20 +100,26 @@ static int limit_adjust_cpufreq_notifier(struct notifier_block *nb,
 					 unsigned long event, void *data)
 {
 	struct cpufreq_policy *policy = data;
+	static int policy_min = 100000;
+	static bool flipped = false;
 
-	if (event != CPUFREQ_ADJUST)
-		return 0;
-
-	/* This is our indicator of GPU activity */
-	if (regulator_is_enabled(g3d_pd_regulator))
-#ifdef CONFIG_LIVE_OC
-		cpufreq_verify_within_limits(policy, get_gpuminfreq(),
+	if (flipped == false)
+	{
+		if (regulator_is_enabled(g3d_pd_regulator))
+		{
+			policy_min = policy->user_policy.min;
+			cpufreq_verify_within_limits(policy, MIN_CPU_KHZ_FREQ,
 					     policy->cpuinfo.max_freq);
-#else
-		cpufreq_verify_within_limits(policy, MIN_CPU_KHZ_FREQ,
-					     policy->cpuinfo.max_freq);
-#endif
-
+			flipped = true;
+		}
+	} else 
+	{
+		if (!regulator_is_enabled(g3d_pd_regulator))
+		{
+			policy->min = policy_min;
+			flipped = false;
+		}
+	}
 	return 0;
 }
 
