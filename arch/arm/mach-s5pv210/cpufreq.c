@@ -32,11 +32,12 @@ static struct clk *dmc1_clk;
 static struct cpufreq_freqs freqs;
 static DEFINE_MUTEX(set_freq_lock);
 
-/* APLL M,P,S values for 1G/800Mhz */
-#define APLL_VAL_1400	((1 << 31) | (175 << 16) | (3 << 8) | 1)
+/* APLL M,P,S values for 1.4Gzhz/1.3Ghz/1.2Ghz/1Ghz/800Mhz */
+#define APLL_VAL_1400	((1 << 31) | (200 << 16) | (6 << 8) | 1)
+#define APLL_VAL_1300	((1 << 31) | (175 << 16) | (3 << 8) | 1)
 #define APLL_VAL_1200	((1 << 31) | (150 << 16) | (3 << 8) | 1)
 #define APLL_VAL_1000	((1 << 31) | (125 << 16) | (3 << 8) | 1)
-#define APLL_VAL_800	((1 << 31) | (100 << 16) | (3 << 8) | 1)
+#define APLL_VAL_800		((1 << 31) | (100 << 16) | (3 << 8) | 1)
 
 #define SLEEP_FREQ	(800 * 1000) /* Use 800MHz when entering sleep */
 
@@ -64,7 +65,7 @@ struct dram_conf {
 static struct dram_conf s5pv210_dram_conf[2];
 
 enum perf_level {
-	L0, L1, L2, L3, L4, L5, L6,
+	L0, L1, L2, L3, L4, L5, L6, L7
 };
 
 enum s5pv210_mem_type {
@@ -80,12 +81,13 @@ enum s5pv210_dmc_port {
 
 static struct cpufreq_frequency_table s5pv210_freq_table[] = {
 	{L0, 1400*1000},
-	{L1, 1200*1000},
-	{L2, 1000*1000},
-	{L3, 800*1000},
-	{L4, 400*1000},
-	{L5, 200*1000},
-	{L6, 100*1000},
+	{L1, 1300*1000},	
+	{L2, 1200*1000},
+	{L3, 1000*1000},
+	{L4, 800*1000},
+	{L5, 400*1000},
+	{L6, 200*1000},
+	{L7, 100*1000},
 	{0, CPUFREQ_TABLE_END},
 };
 
@@ -111,26 +113,30 @@ static struct s5pv210_dvs_conf dvs_conf[] = {
 		.int_volt   = 1200000,
 	},
 	[L1] = {
-		.arm_volt   = 1325000,
+		.arm_volt   = 1425000,
 		.int_volt   = 1150000,
 	},
 	[L2] = {
+		.arm_volt   = 1325000,
+		.int_volt   = 1150000,
+	},
+	[L3] = {
 		.arm_volt   = 1250000,
 		.int_volt   = 1100000,
 	},
-	[L3] = {
+	[L4] = {
 		.arm_volt   = 1200000,
 		.int_volt   = 1100000,
 	},
-	[L4] = {
+	[L5] = {
 		.arm_volt   = 1050000,
 		.int_volt   = 1100000,
 	},
-	[L5] = {
+	[L6] = {
 		.arm_volt   = 950000,
 		.int_volt   = 1100000,
 	},
-	[L6] = {
+	[L7] = {
 		.arm_volt   = 950000,
 		.int_volt   = 1000000,
 	},
@@ -147,22 +153,25 @@ static u32 clkdiv_val[8][11] = {
 	/* L0 : [1400/200/200/100][166/83][133/66][200/200] */
 	{0, 6, 6, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* L1 : [1200/200/200/100][166/83][133/66][200/200] */
+	/* L1 : [1300/200/200/100][166/83][133/66][200/200] */
 	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* L2 : [1000/200/100][166/83][133/66][200/200] */
+	/* L2 : [1200/200/200/100][166/83][133/66][200/200] */
+	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
+
+	/* L3 : [1000/200/100][166/83][133/66][200/200] */
 	{0, 4, 4, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* L3 : [800/200/100][166/83][133/66][200/200] */
+	/* L4 : [800/200/100][166/83][133/66][200/200] */
 	{0, 3, 3, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* L4 : [400/200/100][166/83][133/66][200/200] */
+	/* L5 : [400/200/100][166/83][133/66][200/200] */
 	{1, 3, 1, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* L5 : [200/200/100][166/83][133/66][200/200] */
+	/* L6 : [200/200/100][166/83][133/66][200/200] */
 	{3, 3, 1, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* L6 : [100/100/100][83/83][66/66][100/100] */
+	/* L7 : [100/100/100][83/83][66/66][100/100] */
 	{7, 7, 0, 0, 7, 0, 9, 0, 7, 0, 0},
 };
 
@@ -295,11 +304,11 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 	cpufreq_notify_transition(&freqs, CPUFREQ_PRECHANGE);
 
 	/* Check if there need to change PLL */
-	if ((index <= L2) || (freqs.old >= s5pv210_freq_table[L2].frequency))
+	if ((index <= L3) || (freqs.old >= s5pv210_freq_table[L3].frequency))
 		pll_changing = 1;
 
 	/* Check if there need to change System bus clock */
-	if ((index == L6) || (freqs.old == s5pv210_freq_table[L6].frequency))
+	if ((index == L7) || (freqs.old == s5pv210_freq_table[L7].frequency))
 		bus_speed_changing = 1;
 
 #ifdef CONFIG_LIVE_OC
@@ -406,7 +415,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 	/* ARM MCS value changed */
 	reg = __raw_readl(S5P_ARM_MCS_CON);
 	reg &= ~0x3;
-	if (index >= L5)
+	if (index >= L6)
 		reg |= 0x3;
 	else
 		reg |= 0x1;
@@ -426,13 +435,16 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		__raw_writel(apll_values[index], S5P_APLL_CON);
 #else
 		switch ( index ) {
-            case L0:
+	     case L0:
                 __raw_writel(APLL_VAL_1400, S5P_APLL_CON);
                 break;
             case L1:
-                __raw_writel(APLL_VAL_1200, S5P_APLL_CON);
+                __raw_writel(APLL_VAL_1300, S5P_APLL_CON);
                 break;
             case L2:
+                __raw_writel(APLL_VAL_1200, S5P_APLL_CON);
+                break;
+            case L3:
                 __raw_writel(APLL_VAL_1000, S5P_APLL_CON);
                 break;
 
@@ -510,7 +522,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		} while (reg & (1 << 15));
 
 		/* Reconfigure DRAM refresh counter value */
-		if (index != L6) {
+		if (index != L7) {
 			/*
 			 * DMC0 : 166Mhz
 			 * DMC1 : 200Mhz
