@@ -15,10 +15,11 @@
 
 #define MAX_OCVALUE 150
 
-extern void liveoc_update(unsigned int oc_value, unsigned int oc_target);
+extern void liveoc_update(unsigned int oc_value);
 
 static int oc_value = 100;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /* Apply Live OC to 200MHz and above*/
 static int oc_low_freq = 200000;
@@ -29,6 +30,8 @@ static int oc_high_freq = 800000;
 static int oc_target = 800000;
 >>>>>>> parent of a431ad5... [MOD] Add Lower/Higher Frequency Limit on LiveOC
 
+=======
+>>>>>>> parent of ed35601... [MOD]Selective LiveOC
 static ssize_t liveoc_ocvalue_read(struct device * dev, struct device_attribute * attr, char * buf)
 {
     return sprintf(buf, "%u\n", oc_value);
@@ -51,7 +54,7 @@ static ssize_t liveoc_ocvalue_write(struct device * dev, struct device_attribute
 			{
 			    oc_value = data;
 		    
-			    liveoc_update(oc_value, oc_target);
+			    liveoc_update(oc_value);
 			}
 
 		    pr_info("LIVEOC oc-value set to %u\n", oc_value);
