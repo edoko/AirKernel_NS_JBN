@@ -110,7 +110,7 @@ const unsigned long int_volt_max = 1300000;
 static struct s5pv210_dvs_conf dvs_conf[] = {
 	[L0] = {
 		.arm_volt   = 1450000,
-		.int_volt   = 1200000,
+		.int_volt   = 1150000,
 	},
 	[L1] = {
 		.arm_volt   = 1425000,
@@ -118,7 +118,7 @@ static struct s5pv210_dvs_conf dvs_conf[] = {
 	},
 	[L2] = {
 		.arm_volt   = 1325000,
-		.int_volt   = 1150000,
+		.int_volt   = 1100000,
 	},
 	[L3] = {
 		.arm_volt   = 1250000,
@@ -434,24 +434,23 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 #ifdef CONFIG_LIVE_OC
 		__raw_writel(apll_values[index], S5P_APLL_CON);
 #else
-		switch ( index ) {
-	     case L0:
-                __raw_writel(APLL_VAL_1400, S5P_APLL_CON);
-                break;
-            case L1:
-                __raw_writel(APLL_VAL_1300, S5P_APLL_CON);
-                break;
-            case L2:
-                __raw_writel(APLL_VAL_1200, S5P_APLL_CON);
-                break;
-            case L3:
-                __raw_writel(APLL_VAL_1000, S5P_APLL_CON);
-                break;
-
-            default:
-                __raw_writel(APLL_VAL_800, S5P_APLL_CON); 
-                break;
-        }
+		switch (index) {
+			case L0:
+                		__raw_writel(APLL_VAL_1400, S5P_APLL_CON);
+				break;
+			case L1:
+				__raw_writel(APLL_VAL_1300, S5P_APLL_CON);
+				break;
+			case L2:
+				__raw_writel(APLL_VAL_1200, S5P_APLL_CON);
+				break;
+			case L3:
+				__raw_writel(APLL_VAL_1000, S5P_APLL_CON);
+				break;
+			default:
+				__raw_writel(APLL_VAL_800, S5P_APLL_CON); 
+				break;
+        	}
 #endif
 
 		do {
@@ -893,15 +892,15 @@ static struct freq_attr *s5pv210_cpufreq_attr[] = {
 
 static struct cpufreq_driver s5pv210_driver = {
 	.flags		= CPUFREQ_STICKY,
-	.verify		= s5pv210_verify_speed,
-	.target		= s5pv210_target,
+	.verify	= s5pv210_verify_speed,
+	.target	= s5pv210_target,
 	.get		= s5pv210_getspeed,
 	.init		= s5pv210_cpu_init,
 	.name		= "s5pv210",
 	.attr		= s5pv210_cpufreq_attr,
 #ifdef CONFIG_PM
 	.suspend	= s5pv210_cpufreq_suspend,
-	.resume		= s5pv210_cpufreq_resume,
+	.resume	= s5pv210_cpufreq_resume,
 #endif
 };
 
