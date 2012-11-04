@@ -93,9 +93,6 @@ IMG_UINT32   PVRSRV_BridgeDispatchKM( IMG_UINT32  Ioctl,
 static struct clk *g3d_clock;
 static struct regulator *g3d_pd_regulator;
 
-#ifdef CONFIG_PVR_LIMIT_MINFREQ
-#define MIN_CPU_KHZ_FREQ 200000
-
 static int limit_adjust_cpufreq_notifier(struct notifier_block *nb,
 					 unsigned long event, void *data)
 {
