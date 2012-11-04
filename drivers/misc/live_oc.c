@@ -15,28 +15,28 @@
 
 #define MAX_OCVALUE 150
 
-extern void liveoc_update(unsigned int oc_value, unsigned int oc_low_freq, unsigned int oc_high_freq);
+extern void liveoc_update(unsigned int oc_value, unsigned int oc_target);
 
 static int oc_value = 100;
 
+<<<<<<< HEAD
 /* Apply Live OC to 200MHz and above*/
 static int oc_low_freq = 200000;
 /* Apply Live OC to 800MHz and below */
 static int oc_high_freq = 800000;
+=======
+/* Apply Live OC to 800MHz and above*/
+static int oc_target = 800000;
+>>>>>>> parent of a431ad5... [MOD] Add Lower/Higher Frequency Limit on LiveOC
 
 static ssize_t liveoc_ocvalue_read(struct device * dev, struct device_attribute * attr, char * buf)
 {
     return sprintf(buf, "%u\n", oc_value);
 }
 
-static ssize_t liveoc_octarget_low_read(struct device * dev, struct device_attribute * attr, char * buf)
+static ssize_t liveoc_octarget_read(struct device * dev, struct device_attribute * attr, char * buf)
 {
-    return sprintf(buf, "%u\n", oc_low_freq);
-}
-
-static ssize_t liveoc_octarget_high_read(struct device * dev, struct device_attribute * attr, char * buf)
-{
-    return sprintf(buf, "%u\n", oc_high_freq);
+    return sprintf(buf, "%u\n", oc_target);
 }
 
 static ssize_t liveoc_ocvalue_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
@@ -51,7 +51,7 @@ static ssize_t liveoc_ocvalue_write(struct device * dev, struct device_attribute
 			{
 			    oc_value = data;
 		    
-			    liveoc_update(oc_value, oc_low_freq, oc_high_freq);
+			    liveoc_update(oc_value, oc_target);
 			}
 
 		    pr_info("LIVEOC oc-value set to %u\n", oc_value);
@@ -69,55 +69,29 @@ static ssize_t liveoc_ocvalue_write(struct device * dev, struct device_attribute
     return size;
 }
 
-static ssize_t liveoc_octarget_low_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
+static ssize_t liveoc_octarget_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
 {
     unsigned int data;
 
-    if(sscanf(buf, "%u\n", &data) == 1)
+    if(sscanf(buf, "%u\n", &data) == 1) 
 	{
-	    if (data != oc_low_freq && data <= oc_high_freq)
+	    if (data != oc_value)
 		{
-		    oc_low_freq = data;
+		    oc_target = data;
 	    
-		    liveoc_update(oc_value, oc_low_freq, oc_high_freq);
-
-		    pr_info("LIVEOC oc-target-low set to %u\n", oc_low_freq);
+		    liveoc_update(oc_value, oc_target);
+		    pr_info("LIVEOC oc-target set to %u\n", oc_target);
 		}
 	    else
 		{
-		    pr_info("%s: invalid input range %u\n", __FUNCTION__, oc_low_freq);
+		    pr_info("%s: invalid input range %u\n", __FUNCTION__, data);
 		}
-	}
-    else
+	} 
+    else 
 	{
-		pr_info("%s: invalid input\n", __FUNCTION__);
+	    pr_info("%s: invalid input\n", __FUNCTION__);
 	}
-    return size;
-}
 
-static ssize_t liveoc_octarget_high_write(struct device * dev, struct device_attribute * attr, const char * buf, size_t size)
-{
-    unsigned int data;
-
-    if(sscanf(buf, "%u\n", &data) == 1)
-	{
-	    if (data != oc_high_freq && data >= oc_low_freq)
-		{
-		    oc_high_freq = data;
-	    
-		    liveoc_update(oc_value, oc_low_freq, oc_high_freq);
-
-		    pr_info("LIVEOC oc-target-high set to %u\n", oc_high_freq);
-		}
-	    else
-		{
-		    pr_info("%s: invalid input range %u\n", __FUNCTION__, oc_high_freq);
-		}
-	}
-    else
-	{
-		pr_info("%s: invalid input\n", __FUNCTION__);
-	}
     return size;
 }
 
@@ -127,15 +101,13 @@ static ssize_t liveoc_version(struct device * dev, struct device_attribute * att
 }
 
 static DEVICE_ATTR(oc_value, S_IRUGO | S_IWUGO, liveoc_ocvalue_read, liveoc_ocvalue_write);
-static DEVICE_ATTR(oc_target_low, S_IRUGO | S_IWUGO, liveoc_octarget_low_read, liveoc_octarget_low_write);
-static DEVICE_ATTR(oc_target_high, S_IRUGO | S_IWUGO, liveoc_octarget_high_read, liveoc_octarget_high_write);
+static DEVICE_ATTR(oc_target, S_IRUGO | S_IWUGO, liveoc_octarget_read, liveoc_octarget_write);
 static DEVICE_ATTR(version, S_IRUGO , liveoc_version, NULL);
 
 static struct attribute *liveoc_attributes[] = 
     {
 	&dev_attr_oc_value.attr,
-	&dev_attr_oc_target_low.attr,
-	&dev_attr_oc_target_high.attr,
+	&dev_attr_oc_target.attr,
 	&dev_attr_version.attr,
 	NULL
     };
