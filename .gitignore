@@ -81,4 +81,6 @@ GTAGS
 
 *.orig
 *~
+/patch1
+build.sh
 \#*#
