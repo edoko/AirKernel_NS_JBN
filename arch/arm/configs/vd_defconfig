@@ -1,6 +1,6 @@
 #
 # Automatically generated make config: don't edit
-# Linux/arm 3.0.50 Kernel Configuration
+# Linux/arm 3.0.57 Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -176,6 +176,7 @@ CONFIG_LBDAF=y
 #
 CONFIG_IOSCHED_NOOP=y
 CONFIG_IOSCHED_DEADLINE=y
+CONFIG_IOSCHED_ROW=y
 CONFIG_IOSCHED_CFQ=y
 CONFIG_IOSCHED_SIO=y
 CONFIG_IOSCHED_VR=y
@@ -2168,7 +2169,6 @@ CONFIG_USB_DEVICE_CLASS=y
 # also be needed; see USB_STORAGE Help for more info
 #
 # CONFIG_USB_STORAGE is not set
-# CONFIG_USB_UAS is not set
 # CONFIG_USB_LIBUSUAL is not set
 
 #
