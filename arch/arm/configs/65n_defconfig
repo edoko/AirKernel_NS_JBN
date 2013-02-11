@@ -1,6 +1,6 @@
 #
 # Automatically generated make config: don't edit
-# Linux/arm 3.0.57 Kernel Configuration
+# Linux/arm 3.0.62 Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -183,6 +183,7 @@ CONFIG_IOSCHED_VR=y
 CONFIG_IOSCHED_BFQ=y
 CONFIG_CGROUP_BFQIO=y
 # CONFIG_DEFAULT_DEADLINE is not set
+# CONFIG_DEFAULT_ROW is not set
 # CONFIG_DEFAULT_CFQ is not set
 CONFIG_DEFAULT_SIO=y
 # CONFIG_DEFAULT_BFQ is not set
@@ -1398,13 +1399,7 @@ CONFIG_OPTICAL_GP2A=y
 #
 # Hardware I/O ports
 #
-CONFIG_SERIO=y
-CONFIG_SERIO_SERPORT=y
-# CONFIG_SERIO_AMBAKMI is not set
-CONFIG_SERIO_LIBPS2=y
-# CONFIG_SERIO_RAW is not set
-# CONFIG_SERIO_ALTERA_PS2 is not set
-# CONFIG_SERIO_PS2MULT is not set
+# CONFIG_SERIO is not set
 # CONFIG_GAMEPORT is not set
 
 #
