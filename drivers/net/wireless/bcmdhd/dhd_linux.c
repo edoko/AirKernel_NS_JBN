@@ -544,9 +544,10 @@ static int dhd_set_suspend(int value, dhd_pub_t *dhd)
 		__FUNCTION__, value, dhd->in_suspend));
 
 #ifdef CONFIG_BCMDHD_PM_OPTION
-if (pm_option == 1)
-	power_mode = PM_FAST;
+	if (pm_option == 1)
+	    power_mode = PM_FAST;
 #endif
+
 	dhd_suspend_lock(dhd);
 	if (dhd && dhd->up) {
 		if (value && dhd->in_suspend) {
